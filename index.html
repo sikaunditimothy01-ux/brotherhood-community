@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>The Brotherhood Community - Membership</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background: #111;
+            color: #fff;
+            padding: 15px;
+            text-align: center;
+        }
+        .container {
+            width: 90%;
+            max-width: 600px;
+            background: #fff;
+            margin: 20px auto;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+        }
+        button {
+            margin-top: 15px;
+            padding: 10px;
+            width: 100%;
+            background: #111;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #333;
+        }
+        .status {
+            text-align: center;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+        .admin {
+            margin-top: 30px;
+            background: #eee;
+            padding: 15px;
+        }
+        .member {
+            border-bottom: 1px solid #ccc;
+            padding: 10px 0;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>THE BROTHERHOOD COMMUNITY</h1>
+    <p>New Membership Registration</p>
+</header>
+
+<div class="container">
+    <h2>Membership Form</h2>
+
+    <label>First Name</label>
+    <input type="text" id="firstName" required>
+
+    <label>Last Name</label>
+    <input type="text" id="lastName" required>
+
+    <label>Phone Number</label>
+    <input type="text" id="phone" required>
+
+    <label>Email Address</label>
+    <input type="email" id="email" required>
+
+    <label>Why are you joining this community?</label>
+    <textarea id="reason" rows="3"></textarea>
+
+    <label>What do you want to become (goal) in life?</label>
+    <textarea id="goal" rows="3"></textarea>
+
+    <button onclick="submitForm()">Submit Application</button>
+
+    <div class="status" id="statusMsg"></div>
+</div>
+
+<div class="container admin">
+    <h2>Admin Panel</h2>
+    <div id="adminList"></div>
+</div>
+
+<script>
+    function submitForm() {
+        let members = JSON.parse(localStorage.getItem("members")) || [];
+
+        let member = {
+            firstName: document.getElementById("firstName").value,
+            lastName: document.getElementById("lastName").value,
+            phone: document.getElementById("phone").value,
+            email: document.getElementById("email").value,
+            reason: document.getElementById("reason").value,
+            goal: document.getElementById("goal").value,
+            status: "Pending"
+        };
+
+        members.push(member);
+        localStorage.setItem("members", JSON.stringify(members));
+
+        document.getElementById("statusMsg").innerText =
+            "Application submitted. Awaiting admin confirmation.";
+
+        document.querySelector("form")?.reset();
+        loadAdmin();
+    }
+
+    function confirmMember(index) {
+        let members = JSON.parse(localStorage.getItem("members"));
+        members[index].status = "Confirmed";
+        localStorage.setItem("members", JSON.stringify(members));
+        loadAdmin();
+    }
+
+    function loadAdmin() {
+        let members = JSON.parse(localStorage.getItem("members")) || [];
+        let adminList = document.getElementById("adminList");
+        adminList.innerHTML = "";
+
+        members.forEach((m, i) => {
+            adminList.innerHTML += `
+                <div class="member">
+                    <strong>${m.firstName} ${m.lastName}</strong><br>
+                    Email: ${m.email}<br>
+                    Status: ${m.status}<br>
+                    ${m.status === "Pending" 
+                        ? `<button onclick="confirmMember(${i})">Confirm Member</button>` 
+                        : ""}
+                </div>
+            `;
+        });
+    }
+
+    loadAdmin();
+</script>
+
+</body>
+</html>
